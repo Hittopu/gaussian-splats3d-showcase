@@ -25,6 +25,19 @@ Controls:
 
 This viewer uses `@mkkellogg/gaussian-splats-3d` and local `.splat` assets.
 
+Online demo:
+
+```text
+https://hittopu.github.io/gaussian-splats3d-showcase/
+```
+
+The `.splat` files are stored under `public/assets/`. GitHub's repository UI cannot preview this binary format directly, but GitHub Pages can serve them and the viewer loads them in the browser.
+
+Direct asset URLs:
+
+- `https://hittopu.github.io/gaussian-splats3d-showcase/assets/hitsz_main_building_showcase.splat`
+- `https://hittopu.github.io/gaussian-splats3d-showcase/assets/rocket_showcase.splat`
+
 ## GitHub Pages
 
 This project is already GitHub Pages-ready.
