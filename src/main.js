@@ -6,6 +6,8 @@ const root = document.querySelector("#viewerRoot");
 const canvas = document.querySelector("#splatCanvas");
 const baseUrl = import.meta.env.BASE_URL || "/";
 const assetPath = (name) => `${baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`}assets/${name}`;
+const rawAssetPath = (name) =>
+  `https://raw.githubusercontent.com/Hittopu/gaussian-splats3d-showcase/main/public/assets/${name}`;
 
 const renderer = new THREE.WebGLRenderer({
   canvas,
@@ -60,6 +62,7 @@ const scenes = {
   building: {
     title: "HITSZ Main Building",
     path: assetPath("hitsz_main_building_showcase.splat"),
+    fallbackPath: rawAssetPath("hitsz_main_building_showcase.splat"),
     asset: "8.7 MB",
     capture: "campus video",
     format: "SPLAT",
@@ -86,6 +89,7 @@ const scenes = {
   rocket: {
     title: "Campus Rocket",
     path: assetPath("rocket_showcase.splat"),
+    fallbackPath: rawAssetPath("rocket_showcase.splat"),
     asset: "14 MB",
     capture: "phone video",
     format: "SPLAT",
@@ -137,6 +141,7 @@ const state = {
   loading: false,
   pendingScene: null,
   loadedAll: false,
+  sceneOrder: [],
   mode: "orbit",
   auto: true,
   dragging: false,
@@ -249,10 +254,7 @@ async function loadScene(key) {
 
   try {
     if (!state.loadedAll) {
-      await viewer.addSplatScenes([
-        sceneToLoadOptions("building", key === "building"),
-        sceneToLoadOptions("rocket", key === "rocket"),
-      ], true);
+      await loadAllSplatScenes(key);
       state.loadedAll = true;
       cacheSceneCounts();
     }
@@ -270,10 +272,37 @@ async function loadScene(key) {
   }
 }
 
-function sceneToLoadOptions(key, visible) {
+async function loadAllSplatScenes(activeKey) {
+  state.sceneOrder = [];
+  for (const key of Object.keys(scenes)) {
+    await addSplatSceneWithFallback(key, key === activeKey);
+  }
+  if (!state.sceneOrder.length) {
+    throw new Error("No splat scenes could be loaded.");
+  }
+}
+
+async function addSplatSceneWithFallback(key, visible) {
+  const data = scenes[key];
+  const candidates = [data.path, data.fallbackPath].filter(Boolean);
+  let lastError = null;
+  for (const path of candidates) {
+    try {
+      await viewer.addSplatScene(path, sceneToLoadOptions(key, visible, path));
+      state.sceneOrder.push(key);
+      return;
+    } catch (error) {
+      lastError = error;
+      console.warn(`Failed to load ${key} from ${path}; trying next source.`, error);
+    }
+  }
+  throw lastError ?? new Error(`Could not load ${key}`);
+}
+
+function sceneToLoadOptions(key, visible, path) {
   const data = scenes[key];
   return {
-    path: data.path,
+    path,
     splatAlphaRemovalThreshold: 2,
     position: data.transform.position,
     rotation: data.transform.rotation,
@@ -284,7 +313,7 @@ function sceneToLoadOptions(key, visible) {
 }
 
 function cacheSceneCounts() {
-  Object.keys(scenes).forEach((key, index) => {
+  state.sceneOrder.forEach((key, index) => {
     const count = viewer.getSplatScene?.(index)?.splatBuffer?.getSplatCount?.() ?? 0;
     if (count) state.loadedCounts[key] = count;
   });
@@ -293,7 +322,7 @@ function cacheSceneCounts() {
 function activateScene(key) {
   const data = scenes[key];
   state.sceneKey = key;
-  Object.keys(scenes).forEach((sceneKey, index) => {
+  state.sceneOrder.forEach((sceneKey, index) => {
     const scene = viewer.getSplatScene?.(index);
     if (!scene) return;
     const active = sceneKey === key;
@@ -309,7 +338,7 @@ function activateScene(key) {
 function syncSceneVisibilityUniforms() {
   const uniforms = viewer.splatMesh?.material?.uniforms;
   if (!uniforms?.sceneVisibility || !uniforms?.sceneOpacity) return;
-  Object.keys(scenes).forEach((key, index) => {
+  state.sceneOrder.forEach((key, index) => {
     const active = key === state.sceneKey;
     uniforms.sceneVisibility.value[index] = active ? 1 : 0;
     uniforms.sceneOpacity.value[index] = active ? 1 : 0;
