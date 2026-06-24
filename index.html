@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23070a0d'/%3E%3Ccircle cx='11' cy='11' r='4' fill='%2342dfc3'/%3E%3Ccircle cx='21' cy='10' r='3' fill='%23ffc15c'/%3E%3Ccircle cx='18' cy='22' r='5' fill='%2369c8ff'/%3E%3C/svg%3E" />
+    <title>HC for 3DGS Showcase</title>
+  </head>
+  <body>
+    <div id="app">
+      <main id="viewerRoot" aria-label="3D Gaussian Splatting viewer">
+        <canvas id="splatCanvas" tabindex="0"></canvas>
+
+        <section class="hud hud-left" aria-label="project information">
+          <div class="brand">
+            <div class="brand-mark" aria-hidden="true"></div>
+            <div>
+              <p>HITSZ 3DGS SHOWCASE</p>
+              <h1 id="sceneTitle">Main Building</h1>
+            </div>
+          </div>
+
+          <div class="metric-grid">
+            <div class="metric">
+              <span>Splats</span>
+              <strong id="splatsValue">loading</strong>
+            </div>
+            <div class="metric">
+              <span>Asset</span>
+              <strong id="assetValue">.splat</strong>
+            </div>
+            <div class="metric">
+              <span>Capture</span>
+              <strong id="captureValue">video</strong>
+            </div>
+            <div class="metric">
+              <span>Mode</span>
+              <strong id="modeValue">Orbit</strong>
+            </div>
+          </div>
+
+          <div class="story">
+            <strong>Course demo story</strong>
+            <p id="sceneStory">
+              手机视频重建真实校园场景，再发布成可浏览的 3D Gaussian Splatting web asset。
+            </p>
+          </div>
+
+          <div class="codec-panel">
+            <div class="codec-head">
+              <span>Research Overlay</span>
+              <b>Guarded Allocator</b>
+            </div>
+            <div class="bar-row">
+              <span>Original PLY</span>
+              <div class="bar"><i class="original"></i></div>
+              <b id="origSizeValue">510 MB</b>
+            </div>
+            <div class="bar-row">
+              <span>Packed payload</span>
+              <div class="bar"><i id="packedBar" class="packed"></i></div>
+              <b id="packedSizeValue">47 MB</b>
+            </div>
+            <p id="codecText">
+              full-model packed payload：xyz / opacity / scale / rotation / f_dc / f_rest 都计入，约 10.6x。
+            </p>
+          </div>
+        </section>
+
+        <section class="hud hud-right" aria-label="scene controls">
+          <div class="panel-title">
+            <span>Scene</span>
+            <strong id="statusText">loading</strong>
+          </div>
+          <div class="scene-tabs" role="tablist" aria-label="scene selector">
+            <button class="scene-button active" data-scene="building" role="tab" aria-selected="true">
+              主楼
+            </button>
+            <button class="scene-button" data-scene="rocket" role="tab" aria-selected="false">
+              火箭
+            </button>
+          </div>
+
+          <div class="control-grid">
+            <button id="orbitButton" class="control-button active" type="button">Orbit</button>
+            <button id="walkButton" class="control-button" type="button">Walk</button>
+            <button id="resetButton" class="control-button" type="button">Reset</button>
+            <button id="autoButton" class="control-button" type="button">Auto</button>
+          </div>
+
+          <div class="detail-list">
+            <div>
+              <span>Renderer</span>
+              <strong>GaussianSplats3D</strong>
+            </div>
+            <div>
+              <span>Format</span>
+              <strong id="formatValue">SPLAT</strong>
+            </div>
+            <div>
+              <span>Interaction</span>
+              <strong>Mouse + WASD</strong>
+            </div>
+            <div>
+              <span>Height</span>
+              <strong id="heightValue">--</strong>
+            </div>
+            <div>
+              <span>Keys</span>
+              <strong id="keysValue">none</strong>
+            </div>
+          </div>
+        </section>
+
+        <div class="crosshair" aria-hidden="true">
+          <span></span>
+          <span></span>
+        </div>
+
+        <div class="help-strip">
+          <span>Drag: orbit</span>
+          <span>Wheel: zoom</span>
+          <span>Walk: click canvas, WASD</span>
+          <span>Space up, Ctrl/Z down</span>
+          <span>1/2: switch scene</span>
+          <span>R: reset</span>
+        </div>
+      </main>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "name": "gaussian_splats3d_showcase",
+  "version": "1.0.0",
+  "description": "GitHub Pages ready 3D Gaussian Splatting showcase for HITSZ building and rocket demos.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 8788",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 8789",
+    "test": "node scripts/verify.js"
+  },
+  "dependencies": {
+    "@mkkellogg/gaussian-splats-3d": "^0.4.7",
+    "three": "^0.165.0",
+    "vite": "^5.4.11"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.45.3",
+    "pngjs": "^7.0.0"
+  }
+}
